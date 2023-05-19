@@ -1,14 +1,14 @@
 #include <QCoreApplication>
-
 #include "mytcpserver.h"
 #include "SingletonDB.h"
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-/*
+
     MyTcpServer server;
 
+/*
     QSqlDatabase db =
         QSqlDatabase::addDatabase("QSQLITE");//происходит выделение места и обазначения типа переменных в базе данных \ SQLITE работает из коробки\ посгрес работает чесно но не из коробки\ Mysql какашка
     db.setDatabaseName("sqlite.db");
@@ -18,18 +18,18 @@ int main(int argc, char *argv[])
 
     QSqlQuery query(db);
     //создали таблицу
-    query.exec("CREATE TABLE User("
+    query.exec("CREATE TABLE Users("
         "login VARCHAR(20) NOT NULL, "
         "password VARCHAR(20) NOT NULL"
         ")");
 
     //добавить запись в таблицу
-   // query.prepare("INSERT INTO User(login, password) "
+   // query.prepare("INSERT INTO Users(login, password) "
    //             "VALUES (\"admin\", \"123\")");
                   
 
 
-   query.prepare("INSERT INTO User(login, password) "
+   query.prepare("INSERT INTO Users(login, password) "
         "VALUES (:login, :password)");
 
     query.bindValue(":password", "123");
@@ -39,12 +39,12 @@ int main(int argc, char *argv[])
     
     /*
     Выбрать все записи БД
-    SELECT * FROM User
+    SELECT * FROM Users
 
     Выбрать все записи БД с условием
-    SELECT * FROM User WHERE .......
+    SELECT * FROM Users WHERE .......
    */
- /*  query.exec("SELECT * FROM User");
+ /*  query.exec("SELECT * FROM Users");
 
 
     // вывести на экран
@@ -64,6 +64,6 @@ int main(int argc, char *argv[])
     */
     
     
-    qDebug()<<Singleton::getInstance()->sendQuery("SELECT * from User");
+    //qDebug()<<Singleton::getInstance()->sendQuery("SELECT * from Users");
     return a.exec();
 }

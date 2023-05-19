@@ -3,6 +3,7 @@
 #include <QCoreApplication>
 #include "func_for_server.h"
 
+
 MyTcpServer::~MyTcpServer()
 {
     //mTcpSocket->close();
@@ -29,25 +30,38 @@ void MyTcpServer::slotNewConnection(){
         curr_mTcpSocket->write("Hello, World!!! I am echo server!\r\n");/*מעק¸ע*/
         connect(curr_mTcpSocket, &QTcpSocket::readyRead,this,&MyTcpServer::slotServerRead);
         connect(curr_mTcpSocket,&QTcpSocket::disconnected,this,&MyTcpServer::slotClientDisconnected);
-       mTcpSocet->push_back(curr_mTcpSocket);
+       mTcpSocket[curr_mTcpSocket->socketDescriptor()] = curr_mTcpSocket;
     }
 }
 
 void MyTcpServer::slotServerRead()
 {
+    
+    QTcpSocket *curr_mTcpSocket = (QTcpSocket*)sender(); 
+    //mTcpSocet[mTcpServer->socketDescriptor()];
     QByteArray array;
     QString mystr = "";
-    while(mTcpSocket->bytesAvailable()>0)
+    while(curr_mTcpSocket->bytesAvailable()>0)
     {
-        array =mTcpSocket->readAll();
+        array =curr_mTcpSocket->readAll();
         mystr += array;
     }
     array = "";
     array.append(mystr.toUtf8());
     qDebug() << mystr;
-    mTcpSocket->write(parsing(mystr));
+    curr_mTcpSocket->write(parsing(mystr,curr_mTcpSocket->socketDescriptor()));
 }
 
 void MyTcpServer::slotClientDisconnected(){
-    mTcpSocket->close();
+    QTcpSocket *curr_mTcpSocket = (QTcpSocket*)sender();
+    
+    for(auto it = mTcpSocket.begin(); it!=mTcpSocket.end();it++)
+        if(*it ==curr_mTcpSocket)
+        {
+            mTcpSocket.remove(it.key());
+            Singleton::getInstance()->sendQuery("update Users set token = 0 WHERE token = '" + QString::number(it.key())+"'" );
+            break;
+        }
+    curr_mTcpSocket->close();
+    
 }

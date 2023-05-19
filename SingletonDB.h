@@ -27,15 +27,20 @@ class Singleton
 private:
 	static Singleton* p_instance;
 	static SingletonDestroyer destroyer;//корзина
-	//db
+	QSqlDatabase db;
 protected:
 	Singleton() {
-		//db.open
+		db = QSqlDatabase::addDatabase("QSQLITE");//происходит выделение места и обазначения типа переменных в базе данных \ SQLITE работает из коробки\ посгрес работает чесно но не из коробки\ Mysql какашка
+		db.setDatabaseName("sqlite.db");
+		//db.setDatabaseName("sqlite1.db");
+		if (!db.open())
+			qDebug() << db.lastError().text();//выдача последней ошибки	
 	}
+
 	Singleton(const Singleton&) = delete;
 	Singleton& operator = (Singleton&)=delete;
 	~Singleton() {
-		//bd.close
+		db.close();
 	}
 	friend class SingletonDestroyer;
 public:
@@ -49,9 +54,19 @@ public:
 	}
 	QString sendQuery(QString msg)
 	{
-		return "query";
+		QString res = "";
+		QSqlQuery query(db);
+		query.exec(msg);// выполнить запрос
+
+		QSqlRecord rec = query.record();
+		const int loginIndex = rec.indexOf("login");//номер "столбца"
+		const int passwordIndex = rec.indexOf("password");
+		while (query.next())
+		{
+			res=res+query.value(loginIndex).toString() + "\t" + query.value(passwordIndex).toString() + "\n";
+		}
+		qDebug() << res;
+
+		return res;
 	}
 };
-
-Singleton * Singleton::p_instance;
-SingletonDestroyer Singleton::destroyer;
