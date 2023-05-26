@@ -23,8 +23,9 @@ QStringList args = str.split(" ");//создание списка копирующего строку ввода раз
 	}
 	if(str=="checktask")
 	{
-	return "checktask(args[0],args[1],args[2],desc)\r\n";
-	//plug
+	return checktask(args[0],args[1],args[2],desc);
+	//chech task_number task_variant answer
+	// if true update users
 	}
 	if(str=="stat")
 	{
@@ -59,7 +60,7 @@ QByteArray reg(QString log, QString pas,long desc)
 {
 QByteArray ansv;
 QString socket_descriptor=QString::number(desc);
-if(Singleton::getInstance()->sendQuery("SELECT * from Users where login = '"+log+"' and password = '"+pas+"'")=="")
+if(Singleton::getInstance()->sendQuery("SELECT * from Users where login = '"+log+"'")=="")
 //check registration before doing some thing
 {	
 	Singleton::getInstance()->sendQuery("insert into Users (userid,login, password, token) VALUES ('" + socket_descriptor + "','"+log+"','"+pas+"',0)");
@@ -82,12 +83,42 @@ if(Singleton::getInstance()->sendQuery("SELECT * from Users where login = '"+log
 }
 else
 	{
-	ansv= "already taken \r\n";//registration denied report
+	ansv= "reg- already taken \r\n";//registration denied report
 	return ansv;
 	}
 
 }
 
+QByteArray checktask(QString numb,QString var,QString otvet,desc)
+{
+QByteArray ansv;
+QString socket_descriptor=QString::number(desc);
+QMap<QString,int> Spisok_var;
+Spisok_var.insert(0);
+QMap<QString,Spisok_var> Spisok_nomerov;
+if(otvet==Spisok_nomerov[numb,Spisok_var[var]])
+	{
+	if("SELECT * from Users where token = '"+desc+"' and task'"+numb+"' = 0")!="")
+		{
+		Singleton::getInstance()->sendQuery("update Users set task'"+numb+"' = 1 where token ='"+desc+"'")
+		ansv= "Check+\r\n";//Задание выполнено успешно
+		return ansv;
+		}
+	else
+		{
+		Singleton::getInstance()->sendQuery("update Users set task'"+numb+"' = 0 where token ='"+desc+"'")
+		ansv= "Check=\r\n";//Задание исправлено успешно
+		return ansv;
+		}
+	}
+else
+	{
+	Singleton::getInstance()->sendQuery("update Users set task'"+number+"' = -1 where token ='"+desc+"'")
+	ansv= "Check- \r\n";//Задание провалено 
+	return ansv;
+	}
+
+}
 /*	first prototype
 
 if (str == "stop")

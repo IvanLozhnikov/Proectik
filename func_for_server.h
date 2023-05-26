@@ -6,4 +6,5 @@
 QByteArray parsing(QString str,long desc);
 QByteArray auth(QString log, QString pas,long desc);
 QByteArray reg(QString log, QString pas,long desc);
+QByteArray checktask(QString numb,QString var,QString otvet,long desc);
 #endif
