@@ -89,31 +89,34 @@ else
 
 }
 
-QByteArray checktask(QString numb,QString var,QString otvet,desc)
+QByteArray checktask(QString numb,QString var,QString otvet,long desc)
 {
 QByteArray ansv;
 QString socket_descriptor=QString::number(desc);
-QMap<QString,int> Spisok_var;
-Spisok_var.insert(0);
-QMap<QString,Spisok_var> Spisok_nomerov;
-if(otvet==Spisok_nomerov[numb,Spisok_var[var]])
+QString a, b, c, prom;
+QMap<QString,QMap<QString,QString>> Spisok_nomerov;
+QMap<QString,QString> mymap;
+mymap.insert(QString::number(1),QString::number(1));
+ Spisok_nomerov.insert(QString::number(1),mymap);
+prom=Spisok_nomerov[numb][var];//Spisok_nomerov=[numb]{[var][]}
+if(prom==otvet)
 	{
-	if("SELECT * from Users where token = '"+desc+"' and task'"+numb+"' = 0")!="")
+	if(Singleton::getInstance()->sendQuery("SELECT * from Users where token = '"+socket_descriptor+"' and task"+numb+" = 0")!="")
 		{
-		Singleton::getInstance()->sendQuery("update Users set task'"+numb+"' = 1 where token ='"+desc+"'")
+		Singleton::getInstance()->sendQuery("update Users set task"+numb+" = 1 where token ='"+socket_descriptor+"'");
 		ansv= "Check+\r\n";//Задание выполнено успешно
 		return ansv;
 		}
 	else
 		{
-		Singleton::getInstance()->sendQuery("update Users set task'"+numb+"' = 0 where token ='"+desc+"'")
+		Singleton::getInstance()->sendQuery("update Users set task"+numb+" = 0 where token ='"+socket_descriptor+"'");
 		ansv= "Check=\r\n";//Задание исправлено успешно
 		return ansv;
 		}
 	}
 else
 	{
-	Singleton::getInstance()->sendQuery("update Users set task'"+number+"' = -1 where token ='"+desc+"'")
+	Singleton::getInstance()->sendQuery("update Users set task"+numb+" = -1 where token ='"+socket_descriptor+"'");
 	ansv= "Check- \r\n";//Задание провалено 
 	return ansv;
 	}
