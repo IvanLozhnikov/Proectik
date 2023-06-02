@@ -29,7 +29,7 @@ QStringList args = str.split(" ");//создание списка копирующего строку ввода раз
 	}
 	if(str=="stat")
 	{
-	return "stat(desc)\r\n";
+	return stat(desc);
 	//plug
 	}
 	return "check is this thing work \r\n";
@@ -93,23 +93,23 @@ QByteArray checktask(QString numb,QString var,QString otvet,long desc)
 {
 QByteArray ansv;
 QString socket_descriptor=QString::number(desc);
-QString a, b, c, prom;
-QMap<QString,QMap<QString,QString>> Spisok_nomerov;
-QMap<QString,QString> mymap;
-mymap.insert(QString::number(1),QString::number(1));
- Spisok_nomerov.insert(QString::number(1),mymap);
-prom=Spisok_nomerov[numb][var];//Spisok_nomerov=[numb]{[var][]}
-if(prom==otvet)
+//QString a, b, c, prom;
+//QMap<QString,QMap<QString,QString>> Spisok_nomerov;
+//QMap<QString,QString> mymap;
+//mymap.insert(QString::number(1),QString::number(1));
+// Spisok_nomerov.insert(QString::number(1),mymap);
+//prom=Spisok_nomerov[numb][var];//Spisok_nomerov=[numb]{[var][]}
+if(tasks(numb,var,otvet))
 	{
-	if(Singleton::getInstance()->sendQuery("SELECT * from Users where token = '"+socket_descriptor+"' and task"+numb+" = 0")!="")
+	if(Singleton::getInstance()->sendQuery("SELECT * from Users where token = '"+socket_descriptor+"' and task"+numb+" = 0")!=""||Singleton::getInstance()->sendQuery("SELECT * from Users where token = '"+socket_descriptor+"' and task"+numb+" = 2")!="")
 		{
-		Singleton::getInstance()->sendQuery("update Users set task"+numb+" = 1 where token ='"+socket_descriptor+"'");
+		Singleton::getInstance()->sendQuery("update Users set task"+numb+" = 2 where token ='"+socket_descriptor+"'");
 		ansv= "Check+\r\n";//Задание выполнено успешно
 		return ansv;
 		}
 	else
 		{
-		Singleton::getInstance()->sendQuery("update Users set task"+numb+" = 0 where token ='"+socket_descriptor+"'");
+		Singleton::getInstance()->sendQuery("update Users set task"+numb+" = 1 where token ='"+socket_descriptor+"'");
 		ansv= "Check=\r\n";//Задание исправлено успешно
 		return ansv;
 		}
@@ -122,6 +122,40 @@ else
 	}
 
 }
+bool tasks(QString numb,QString var,QString otvet)
+{
+	if(numb=="1")
+	{
+		if(var=="1")
+		{
+			if(otvet=="1")
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+}
+QByteArray stat(long desc)
+{
+int i=2;
+QByteArray ansv;
+QString socket_descriptor=QString::number(desc);
+QString args=Singleton::getInstance()->sendQuery("SELECT task1 from Users  where token = '"+socket_descriptor+"'");
+QString prom;
+while(i<=2)
+{
+prom=QString::number(i);
+args=args+"  "+Singleton::getInstance()->sendQuery("SELECT task'"+prom+"' from Users  where token = '"+socket_descriptor+"'");
+i++;
+}
+return ansv=("Stats: "+args+"\r\n").toUtf8();
+}
+
+
 /*	first prototype
 
 if (str == "stop")
